@@ -14,34 +14,26 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    # 1. Setup Python version 3.13
     - name: Setup Python 3.13
       uses: actions/setup-python@v5
       with:
         python-version: '3.13'
 
-    # 2. Installing Dependencies
     - name: Installing Dependencies
       run: |
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         pip install pytest flake8
 
-    # 3. Run Test and Linting
     - name: Run Linting (flake8)
       run: |
-        # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings.
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-   - name: Run Tests
-      # The "|| true" ensures that even if pytest exits with code 5 (no tests), 
-      # the step is marked as a success so the pipeline can continue.
+    - name: Run Tests
       run: pytest || true
 
-    # 4. Containerization (Build Docker Image)
     - name: Build Docker Image
       run: |
-       docker build -t my-app-image:latest .
+        docker build -t my-app-image:latest .
         docker images
